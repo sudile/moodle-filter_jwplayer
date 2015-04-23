@@ -27,7 +27,7 @@
  */
 
 defined('MOODLE_INTERNAL') || die();
-require_once($CFG->dirroot.'/filter/jwplayer/lib.php');
+require_once($CFG->dirroot.'/local/jwplayer/player.php');
 
 /**
  * Automatic media embedding filter class.
@@ -64,7 +64,7 @@ class filter_jwplayer extends moodle_text_filter {
         }
 
         if (!$this->renderer) {
-            $this->renderer = $PAGE->get_renderer('filter_jwplayer');
+            $this->renderer = $PAGE->get_renderer('local_jwplayer');
             $this->embedmarkers = $this->renderer->get_embeddable_markers();
         }
 
@@ -110,35 +110,10 @@ class filter_jwplayer extends moodle_text_filter {
 
         // If something was embedded, return it, otherwise return original.
         if ($result !== '') {
+            $result = html_writer::tag('div', $result, array('class' => 'filter_jwplayer_media'));
             return $result;
         } else {
             return $matches[0];
-        }
-    }
-
-    /**
-     * Setup filter requirements.
-     *
-     * @param moodle_page $page the page we are going to add requirements to.
-     * @param context $context the context which contents are going to be filtered.
-     */
-    public function setup($page, $context) {
-        $hostingmethod = get_config('filter_jwplayer', 'hostingmethod');
-
-        if ($hostingmethod === 'cloud') {
-            $proto = (get_config('filter_jwplayer', 'securehosting')) ? 'https' : 'http';
-            // For cloud-hosted player account token is required.
-            if ($accounttoken = get_config('filter_jwplayer', 'accounttoken')) {
-                $jwplayer = new moodle_url( $proto . '://jwpsrv.com/library/' . $accounttoken . '.js');
-                $page->requires->js($jwplayer, false);
-            }
-        } else if ($hostingmethod === 'self') {
-            $jwplayer = new moodle_url('/lib/jwplayer/jwplayer.js');
-            $page->requires->js($jwplayer, false);
-
-            if ($licensekey = get_config('filter_jwplayer', 'licensekey')) {
-                $page->requires->js_init_code("jwplayer.key='" . $licensekey . "'");
-            }
         }
     }
 }

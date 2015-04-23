@@ -19,14 +19,18 @@
  *
  * @package    filter
  * @subpackage jwplayer
- * @copyright  2014 Ruslan Kabalin, Lancaster University
+ * @copyright  2014 Ruslan Kabalin, Lancaster University, Johannes Burk <me@jojoob.de>
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
 defined('MOODLE_INTERNAL') || die();
 
-$plugin->version   = 2015032400;        // The current plugin version (Date: YYYYMMDDXX).
-$plugin->requires  = 2013111800;        // Requires Moodle 2.6
-$plugin->component = 'filter_jwplayer'; // Full name of the plugin (used for diagnostics).
+$plugin->version   = 2015042302;
+$plugin->requires  = 2013111800; // moodle 2.6.0
+$plugin->component = 'filter_jwplayer';
 $plugin->maturity = MATURITY_STABLE;
-$plugin->release   = '0.1 for Moodle 2.6+';
+$plugin->release   = 'JW Player multimedia filter Version 0.2.0 (fork by jojoob, Build: 2015042302) for Moodle 2.6+';
+
+$plugin->dependencies = array(
+    'local_jwplayer' => 2015042301,
+);
