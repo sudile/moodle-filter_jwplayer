@@ -130,6 +130,9 @@ class filter_jwplayer_media extends core_media_player {
      *                           for more details see http://support.jwplayer.com/customer/portal/articles/1413089-javascript-api-reference#controls
      *                       playerid
      *                           unique custom id for the player div
+     *                       poster
+     *                           use 'image' key with a moodle_url to an image as poster image
+     *                           displayed before playback starts.
      *                       subtitles
      *                           use 'subtitles' key with an array of subtitle track files
      *                           in vtt or srt format indexed by label name.
@@ -174,6 +177,11 @@ class filter_jwplayer_media extends core_media_player {
             $playersetupdata['title'] = $this->get_name('', $urls);
 
             $playlistitem = array('sources' => $sources);
+
+            // setup poster image
+            if (isset($options['image'])) {
+                $playlistitem['image'] = $options['image']->out();
+            }
 
             // setup subtitle tracks
             if (isset($options['subtitles'])) {
