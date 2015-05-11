@@ -116,6 +116,7 @@ class filter_jwplayer_media extends core_media_player {
      * @param int $width Optional width; 0 to use default
      * @param int $height Optional height; 0 to use default
      * @param array $options Options array
+<<<<<<< HEAD
      *                       buttons
      *                           use 'buttons' key with an array of arrays with id, img, text, callback indexes
      *                           id: unique id across all buttons assigned to this player
@@ -128,8 +129,10 @@ class filter_jwplayer_media extends core_media_player {
      *                               'text'=>'label',
      *                               'callback'=>'M.plugin.callback'))
      *                           for more details see http://support.jwplayer.com/customer/portal/articles/1413089-javascript-api-reference#controls
+=======
      *                       playerid
      *                           unique custom id for the player div
+>>>>>>> dev-customid
      *                       subtitles
      *                           use 'subtitles' key with an array of subtitle track files
      *                           in vtt or srt format indexed by label name.
