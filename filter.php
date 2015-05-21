@@ -101,9 +101,10 @@ class filter_jwplayer extends moodle_text_filter {
             $name = ''; // Use default name.
         }
 
+        $options = array();
         // Split provided URL into alternatives.
-        $urls = filter_jwplayer_split_alternatives($matches[1], $width, $height);
-        $result = $this->renderer->embed_alternatives($urls, $name, $width, $height);
+        $urls = filter_jwplayer_split_alternatives($matches[1], $width, $height, $options);
+        $result = $this->renderer->embed_alternatives($urls, $name, $width, $height, $options);
 
         // If something was embedded, return it, otherwise return original.
         if ($result !== '') {

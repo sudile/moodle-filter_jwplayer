@@ -58,7 +58,7 @@ if (!defined('FILTER_JWPLAYER_AUDIO_HEIGTH')) {
  * @param int $height Output variable: height (0 if not specified)
  * @return array Array of 1 or more moodle_url objects
  */
-function filter_jwplayer_split_alternatives($combinedurl, &$width, &$height) {
+function filter_jwplayer_split_alternatives($combinedurl, &$width, &$height, &$options) {
     $urls = explode('#', $combinedurl);
     $width = 0;
     $height = 0;
@@ -77,16 +77,40 @@ function filter_jwplayer_split_alternatives($combinedurl, &$width, &$height) {
 
         // Can also include the ?d= as part of one of the URLs (if you use
         // more than one they will be ignored except the last).
-        if (preg_match('/\?d=([\d]{1,4})x([\d]{1,4})$/i', $url, $matches)) {
-            $width  = $matches[1];
-            $height = $matches[2];
+        if (preg_match('/((?:[?&]|&amp;)d=([\d]{1,4})x([\d]{1,4}))(?:$|&)/i', $url, $matches)) {
+            $width  = $matches[2];
+            $height = $matches[3];
 
             // Trim from URL.
-            $url = str_replace($matches[0], '', $url);
+            $url = str_replace($matches[1], '', $url);
+        }
+
+        if (preg_match('/((?:[?&]|&amp;)image=([^&]+.png))(?:$|&)/i', $url, $matches)) {
+            $options['image'] = new moodle_url(urldecode($matches[2]));
+
+            // Trim from URL.
+            $url = str_replace($matches[1], '', $url);
+        }
+
+        // if (preg_match('/((?:[?&]|&amp;)sub-([^=]+)=([^&]+.vtt))(?:$|&)/i', $url, $matches)) {
+        while (preg_match('/((?:[?&]|&amp;)sub-([^=]+)=([^&]+.vtt))(?:$|&)/i', $url, $matches)) {
+            $options['subtitles'][$matches[2]] = new moodle_url(urldecode($matches[3]));
+
+            // Trim from URL.
+            $url = str_replace($matches[1], '', $url);
+        }
+
+        if (preg_match('/((?:[?&]|&amp;)playerid=([^&]+))(?:$|&)/i', $url, $matches)) {
+            $options['playerid'] = urldecode($matches[2]);
+
+            // Trim from URL.
+            $url = str_replace($matches[1], '', $url);
         }
 
         // Clean up url.
         $url = filter_var($url, FILTER_VALIDATE_URL);
+        // remove all remained params
+        $url = preg_replace('/[?&].*/', '', $url);
         if (empty($url)) {
             continue;
         }
