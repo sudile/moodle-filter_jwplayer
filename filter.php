@@ -101,9 +101,25 @@ class filter_jwplayer extends moodle_text_filter {
             $name = ''; // Use default name.
         }
 
+        $options = array();
+        $dataattrmatches = null;
+        // poster image (data-image)
+        if (preg_match('/data-image="([^"]+.png)"/i', $matches[0], $dataattrmatches)) {
+            $options['image'] = new moodle_url($dataattrmatches[1]);
+        }
+        // subtitle tracks (data-sub-*)
+        while (preg_match('/data-sub-([^=]+)="([^"]+.vtt)"/i', $matches[0], $dataattrmatches)) {
+            $options['subtitles'][$dataattrmatches[1]] = new moodle_url($dataattrmatches[2]);
+            $matches[0] = str_replace($dataattrmatches[0], '', $matches[0]);
+        }
+        // custom playerid (data-playerid)
+        if (preg_match('/data-playerid="([^"]+)"/i', $matches[0], $dataattrmatches)) {
+            $options['playerid'] = urldecode($dataattrmatches[1]);
+        }
+
         // Split provided URL into alternatives.
         $urls = filter_jwplayer_split_alternatives($matches[1], $width, $height);
-        $result = $this->renderer->embed_alternatives($urls, $name, $width, $height);
+        $result = $this->renderer->embed_alternatives($urls, $name, $width, $height, $options);
 
         // If something was embedded, return it, otherwise return original.
         if ($result !== '') {
