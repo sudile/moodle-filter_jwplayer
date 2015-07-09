@@ -72,6 +72,16 @@ if ($ADMIN->fulltree) {
             get_string('supportrtmpdesc', 'filter_jwplayer'),
             0));
 
+    // Default Poster Image
+    $settings->add(new admin_setting_configstoredfile('filter_jwplayer/defaultposter',
+            get_string('defaultposter', 'filter_jwplayer'),
+            get_string('defaultposterdesc', 'filter_jwplayer'),
+            'defaultposter',
+            0,
+            array(
+                'accepted_types' => array('image')
+            )));
+
     // Download button.
     $settings->add(new admin_setting_configcheckbox('filter_jwplayer/downloadbutton',
             get_string('downloadbutton', 'filter_jwplayer'),
@@ -88,5 +98,16 @@ if ($ADMIN->fulltree) {
     $skinoptions = array_merge($skinoptions, array_combine($skins, $skins));
     $settings->add(new admin_setting_configselect('filter_jwplayer/skin',
             get_string('useplayerskin', 'filter_jwplayer'), '', '', $skinoptions));
-}
 
+
+    // Google Analytics support.
+    $settings->add(new admin_setting_configcheckbox('filter_jwplayer/googleanalytics',
+            get_string('googleanalytics', 'filter_jwplayer'),
+            get_string('googleanalyticsdesc', 'filter_jwplayer'),
+            0));
+			
+    $settings->add(new admin_setting_configtext('filter_jwplayer/gatrackingobject',
+            get_string('gatrackingobject', 'filter_jwplayer'),
+            get_string('gatrackingobjectdesc', 'filter_jwplayer'),
+            '_gaq'));
+}

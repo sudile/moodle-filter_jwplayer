@@ -122,6 +122,44 @@ function filter_jwplayer_split_alternatives($combinedurl, &$width, &$height, &$o
     return $returnurls;
 }
 
+function filter_jwplayer_pluginfile($course, $cm, $context, $filearea, $args, $forcedownload, array $options = array()) {
+    // Check the contextlevel is as expected - if your plugin is a block, this becomes CONTEXT_BLOCK, etc.
+    if ($context->contextlevel != CONTEXT_SYSTEM) {
+        return false; 
+    }
+ 
+    // Make sure the filearea is one of those used by the plugin.
+    if ($filearea !== 'defaultposter') {
+        return false;
+    }
+ 
+    // Make sure the user is logged in and has access to the module (plugins that are not course modules should leave out the 'cm' part).
+    require_login($course, true);
+ 
+    // Use the itemid to retrieve any relevant data records and perform any security checks to see if the
+    // user really does have access to the file in question.
+ 
+    // Extract the filename / filepath from the $args array.
+    $filename = array_pop($args); // The last item in the $args array.
+    if (!$args) {
+        $filepath = '/'; // $args is empty => the path is '/'
+    } else {
+        $filepath = '/'.implode('/', $args).'/'; // $args contains elements of the filepath
+    }
+ 
+    // Retrieve the file from the Files API.
+    $fs = get_file_storage();
+    $file = $fs->get_file($context->id, 'filter_jwplayer', $filearea, 0, $filepath, $filename);
+    if (!$file) {
+        return false; // The file does not exist.
+    }
+ 
+    // We can now send the file back to the browser - in this case with a cache lifetime of 1 day and no filtering. 
+    // From Moodle 2.3, use send_stored_file instead.
+    send_stored_file($file, 86400, 0, $forcedownload, $options);
+}
+
+
 /**
  *  JW Player media filtering library.
  *
@@ -212,6 +250,9 @@ class filter_jwplayer_media extends core_media_player {
             // setup poster image
             if (isset($options['image'])) {
                 $playlistitem['image'] = $options['image']->out();
+            } else if ($poster = get_config('filter_jwplayer', 'defaultposter')) {
+                $syscontext = context_system::instance();
+                $playlistitem['image'] = moodle_url::make_pluginfile_url($syscontext->id, 'filter_jwplayer', 'defaultposter', null, null, $poster)->out(true);
             }
 
             // setup subtitle tracks
@@ -270,6 +311,12 @@ class filter_jwplayer_media extends core_media_player {
                 $buttons = array_merge($buttons, $options['buttons']);
             }
 
+            if (get_config('filter_jwplayer', 'googleanalytics')) {
+                $playersetupdata['ga'] = array(
+                    'trackingobject' => get_config('filter_jwplayer', 'gatrackingobject')
+                );
+            }			
+
             $playersetup = array(
                 'playerid' => $playerid,
                 'setupdata' => $playersetupdata,
@@ -285,8 +332,8 @@ class filter_jwplayer_media extends core_media_player {
             $this->setup();
 
             $PAGE->requires->js_init_call('M.filter_jwplayer.init', $playersetup, true, $jsmodule);
-            $playerdiv = html_writer::tag('div', $this->get_name('', $urls), array('id' => $playerid));
-            $output .= html_writer::tag('div', $playerdiv, array('class' => 'filter_jwplayer_media'));
+            $playerdiv = html_writer::tag('span', $this->get_name('', $urls), array('id' => $playerid));
+            $output .= html_writer::tag('span', $playerdiv, array('class' => 'filter_jwplayer_media'));
         }
 
         return $output;
