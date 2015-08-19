@@ -86,7 +86,7 @@ function filter_jwplayer_split_alternatives($combinedurl, &$width, &$height, &$o
         }
 
         if (preg_match('/((?:[?&]|&amp;)image=([^&]+.png))(?:$|&)/i', $url, $matches)) {
-            $options['image'] = new moodle_url($matches[2]);
+            $options['image'] = new moodle_url(urldecode($matches[2]));
 
             // Trim from URL.
             $url = str_replace($matches[1], '', $url);
@@ -94,7 +94,7 @@ function filter_jwplayer_split_alternatives($combinedurl, &$width, &$height, &$o
 
         // if (preg_match('/((?:[?&]|&amp;)sub-([^=]+)=([^&]+.vtt))(?:$|&)/i', $url, $matches)) {
         while (preg_match('/((?:[?&]|&amp;)sub-([^=]+)=([^&]+.vtt))(?:$|&)/i', $url, $matches)) {
-            $options['subtitles'][$matches[2]] = new moodle_url($matches[3]);
+            $options['subtitles'][$matches[2]] = new moodle_url(urldecode($matches[3]));
 
             // Trim from URL.
             $url = str_replace($matches[1], '', $url);
